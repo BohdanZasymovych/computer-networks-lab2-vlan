@@ -152,7 +152,7 @@ iface lo inet loopback
 auto br1
 iface br1 inet manual
     bridge_ports eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11 eth12
-    bridge_vlan_filtering 1
+    up ip link set dev br1 type bridge vlan_filtering 1
     up bridge vlan add vid 13 dev eth1 pvid untagged
     up bridge vlan del vid 1 dev eth1
     up bridge vlan add vid 14 dev eth2 pvid untagged
