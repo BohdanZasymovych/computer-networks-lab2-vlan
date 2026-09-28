@@ -487,3 +487,85 @@ listening on eth2_24, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 10 packets received by filter
 0 packets dropped by kernel
 ```
+
+
+## Isolation Proof
+
+### Ping Check
+
+`ping` on the IP addresses of interfaces on other VLANs fails with 100% packet loss:
+
+`ping` from the node-1 interface `eth1_13` (vlan 13) to addresses on vlan 14, 23 and 24:
+```bash
+root@node-1:~$ ping -c 5 -I eth1_13 10.0.14.1
+PING 10.0.14.1 (10.0.14.1): 56 data bytes
+
+--- 10.0.14.1 ping statistics ---
+5 packets transmitted, 0 packets received, 100% packet loss
+root@node-1:~$ ping -c 5 -I eth1_13 10.0.23.1
+PING 10.0.23.1 (10.0.23.1): 56 data bytes
+
+--- 10.0.23.1 ping statistics ---
+5 packets transmitted, 0 packets received, 100% packet loss
+root@node-1:~$ ping -c 5 -I eth1_13 10.0.24.1
+PING 10.0.24.1 (10.0.24.1): 56 data bytes
+
+--- 10.0.24.1 ping statistics ---
+5 packets transmitted, 0 packets received, 100% packet loss
+```
+
+The same test was repeated for every VLAN with the same result: an interface's IP address could not be pinged from an interface on a different VLAN.
+
+### ARP Broadcast Isolation
+
+`arping` broadcasts on one VLAN are not seen on the other VLANs.
+
+`arping` on the node-1 interface `eth1_13` (vlan 13):
+```bash
+root@node-1:~$ arping -c 5 -I eth1_13 10.0.13.2
+ARPING 10.0.13.2 from 10.0.13.1 eth1_13
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.209ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.306ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.505ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.206ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.395ms
+Sent 5 probe(s) (0 broadcast(s))
+Received 5 response(s) (0 request(s), 0 broadcast(s))
+```
+
+The broadcast is confirmed to have gone out, since node-3's interface `eth1_13` (on the same vlan 13) replies to it. But nothing arrives on the other VLANs:
+
+`tcpdump` on the node-2 interface `eth2_24` (vlan 24):
+```bash
+root@node-2:~$ tcpdump -n -i eth2_24 arp
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on eth2_24, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+^C
+0 packets captured
+0 packets received by filter
+0 packets dropped by kernel
+```
+
+`tcpdump` on the node-3 interface `eth2_23` (vlan 23):
+```bash
+root@node-3:~$ tcpdump -i eth2_23 arp
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on eth2_23, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+^C
+0 packets captured
+0 packets received by filter
+0 packets dropped by kernel
+```
+
+`tcpdump` on the node-4 interface `eth1_14` (vlan 14):
+```bash
+root@node-4:~$ tcpdump -i eth1_14 arp
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on eth1_14, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+^C
+0 packets captured
+0 packets received by filter
+0 packets dropped by kernel
+```
+
+No ARP packets were captured on any interface belonging to a different VLAN than the one the broadcast was sent on. The same test was repeated for every VLAN with the same result.
