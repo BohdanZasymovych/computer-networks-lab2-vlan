@@ -172,15 +172,15 @@ iface br1 inet manual
 ```
 
 
-## Conectivity Proof
+## Connectivity Proof
 
-To prove conectivity for each links between nodes i run `ping` on one node and `tcpdump` on the other, then wise versa. If ping shows 0% packet loss and `tcpdump` shows ariving data link is healthy. 
+To prove connectivity for each link between nodes, I ran `ping` on one node and `tcpdump` on the other, then repeated it in the opposite direction. If `ping` shows 0% packet loss and `tcpdump` shows the ICMP packets arriving, the link is healthy.
 
-### Node 1 <-> Node 3 Conectivity
+### Node 1 <-> Node 3 Connectivity
 
 **Node-1 -> Node-3**
 
-ping on the node-1:
+`ping` on the node-1:
 ```bash
 root@node-1:~$ ping -c 5 -I eth1_13 10.0.13.2
 PING 10.0.13.2 (10.0.13.2): 56 data bytes
@@ -195,7 +195,7 @@ PING 10.0.13.2 (10.0.13.2): 56 data bytes
 round-trip min/avg/max = 1.755/1.836/1.916 ms
 ```
 
-tcpdump on the node-3:
+`tcpdump` on the node-3:
 ```bash
 root@node-3:~$ tcpdump -i eth1_13 icmp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
@@ -218,6 +218,7 @@ listening on eth1_13, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 **Node-3 -> Node-1**
 
+`ping` on the node-3:
 ```bash
 root@node-3:~$ ping -c 5 -I eth1_13 10.0.13.1
 PING 10.0.13.1 (10.0.13.1): 56 data bytes
@@ -232,6 +233,7 @@ PING 10.0.13.1 (10.0.13.1): 56 data bytes
 round-trip min/avg/max = 1.651/2.906/4.485 ms
 ```
 
+`tcpdump` on the node-1:
 ```bash
 root@node-1:~$ tcpdump -i eth1_13 icmp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
@@ -252,11 +254,11 @@ listening on eth1_13, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 0 packets dropped by kernel
 ```
 
-
-### Node 1 <-> Node 4 Conectivity
+### Node 1 <-> Node 4 Connectivity
 
 **Node-1 -> Node-4**
 
+`ping` on the node-1:
 ```bash
 root@node-1:~$ ping -c 5 -I eth2_14 10.0.14.2
 PING 10.0.14.2 (10.0.14.2): 56 data bytes
@@ -271,6 +273,7 @@ PING 10.0.14.2 (10.0.14.2): 56 data bytes
 round-trip min/avg/max = 1.756/2.617/4.969 ms
 ```
 
+`tcpdump` on the node-4:
 ```bash
 root@node-4:~$ tcpdump -i eth1_14 icmp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
@@ -291,9 +294,9 @@ listening on eth1_14, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 0 packets dropped by kernel
 ```
 
-
 **Node-4 -> Node-1**
 
+`ping` on the node-4:
 ```bash
 root@node-4:~$ ping -c 5 -I eth1_14 10.0.14.1
 PING 10.0.14.1 (10.0.14.1): 56 data bytes
@@ -308,6 +311,7 @@ PING 10.0.14.1 (10.0.14.1): 56 data bytes
 round-trip min/avg/max = 1.964/2.172/2.440 ms
 ```
 
+`tcpdump` on the node-1:
 ```bash
 root@node-1:~$ tcpdump -i eth2_14 icmp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
@@ -328,11 +332,11 @@ listening on eth2_14, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 0 packets dropped by kernel
 ```
 
-
-### Node 2 <-> Node 3 Conectivity
+### Node 2 <-> Node 3 Connectivity
 
 **Node-2 -> Node-3**
 
+`ping` on the node-2:
 ```bash
 root@node-2:~$ ping -c 5 -I eth1_23 10.0.23.2
 PING 10.0.23.2 (10.0.23.2): 56 data bytes
@@ -347,6 +351,7 @@ PING 10.0.23.2 (10.0.23.2): 56 data bytes
 round-trip min/avg/max = 1.840/2.128/2.436 ms
 ```
 
+`tcpdump` on the node-3:
 ```bash
 root@node-3:~$ tcpdump -i eth2_23 icmp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
@@ -367,9 +372,9 @@ listening on eth2_23, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 0 packets dropped by kernel
 ```
 
-
 **Node-3 -> Node-2**
 
+`ping` on the node-3:
 ```bash
 root@node-3:~$ ping -c 5 -I eth2_23 10.0.23.1
 PING 10.0.23.1 (10.0.23.1): 56 data bytes
@@ -384,6 +389,7 @@ PING 10.0.23.1 (10.0.23.1): 56 data bytes
 round-trip min/avg/max = 1.561/1.999/2.304 ms
 ```
 
+`tcpdump` on the node-2:
 ```bash
 root@node-2:~$ tcpdump -i eth1_23 icmp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
@@ -404,10 +410,11 @@ listening on eth1_23, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 0 packets dropped by kernel
 ```
 
-### Node 2 <-> Node 4 Conectivity
+### Node 2 <-> Node 4 Connectivity
 
 **Node-2 -> Node-4**
 
+`ping` on the node-2:
 ```bash
 root@node-2:~$ ping -c 5 -I eth2_24 10.0.24.2
 PING 10.0.24.2 (10.0.24.2): 56 data bytes
@@ -422,6 +429,7 @@ PING 10.0.24.2 (10.0.24.2): 56 data bytes
 round-trip min/avg/max = 1.608/2.848/7.144 ms
 ```
 
+`tcpdump` on the node-4:
 ```bash
 root@node-4:~$ tcpdump -i eth2_24 icmp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
@@ -444,6 +452,7 @@ listening on eth2_24, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 **Node-4 -> Node-2**
 
+`ping` on the node-4:
 ```bash
 root@node-4:~$ ping -c 5 -I eth2_24 10.0.24.1
 PING 10.0.24.1 (10.0.24.1): 56 data bytes
@@ -458,6 +467,7 @@ PING 10.0.24.1 (10.0.24.1): 56 data bytes
 round-trip min/avg/max = 1.532/1.880/2.379 ms
 ```
 
+`tcpdump` on the node-2:
 ```bash
 root@node-2:~$ tcpdump -i eth2_24 icmp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
