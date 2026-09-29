@@ -364,20 +364,40 @@ The same test was repeated for every VLAN with the same result: an interface's I
 ```bash
 root@node-1:~$ arping -c 5 -I eth1_13 10.0.13.2
 ARPING 10.0.13.2 from 10.0.13.1 eth1_13
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.209ms
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.306ms
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.505ms
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.206ms
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.395ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.701ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 2.182ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.473ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.496ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 2.032ms
 Sent 5 probe(s) (0 broadcast(s))
 Received 5 response(s) (0 request(s), 0 broadcast(s))
 ```
 
 The broadcast is confirmed to have gone out, since node-3's interface `eth1_13` (on the same vlan 13) replies to it. But nothing arrives on the other VLANs:
 
+```bash
+root@node-3:~$ tcpdump -n -e -i eth1_13 arp
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on eth1_13, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+12:34:54.532380 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+12:34:54.532431 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+12:34:55.532747 0c:3e:96:80:00:01 > 0c:5a:73:85:00:01, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (0c:5a:73:85:00:01) tell 10.0.13.1, length 46
+12:34:55.532799 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+12:34:56.533108 0c:3e:96:80:00:01 > 0c:5a:73:85:00:01, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (0c:5a:73:85:00:01) tell 10.0.13.1, length 46
+12:34:56.533147 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+12:34:57.533689 0c:3e:96:80:00:01 > 0c:5a:73:85:00:01, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (0c:5a:73:85:00:01) tell 10.0.13.1, length 46
+12:34:57.533728 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+12:34:58.534416 0c:3e:96:80:00:01 > 0c:5a:73:85:00:01, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (0c:5a:73:85:00:01) tell 10.0.13.1, length 46
+12:34:58.534469 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+^C
+10 packets captured
+10 packets received by filter
+0 packets dropped by kernel
+```
+
 `tcpdump` on the node-2 interface `eth2_24` (vlan 24):
 ```bash
-root@node-2:~$ tcpdump -n -i eth2_24 arp
+root@node-2:~$ tcpdump -n -e -i eth2_24 arp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
 listening on eth2_24, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 ^C
@@ -388,7 +408,8 @@ listening on eth2_24, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 `tcpdump` on the node-3 interface `eth2_23` (vlan 23):
 ```bash
-root@node-3:~$ tcpdump -i eth2_23 arp
+root@node-3:~$ tcpdump -n 
+-e -i eth2_23 arp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
 listening on eth2_23, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 ^C
@@ -399,7 +420,7 @@ listening on eth2_23, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 `tcpdump` on the node-4 interface `eth1_14` (vlan 14):
 ```bash
-root@node-4:~$ tcpdump -i eth1_14 arp
+root@node-4:~$ tcpdump -n -e -i eth1_14 arp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
 listening on eth1_14, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 ^C
