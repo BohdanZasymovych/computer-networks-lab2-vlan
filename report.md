@@ -33,20 +33,20 @@ iface eth2_14 inet static
 
 The 3rd octet of each address corresponds to the link between two nodes (`13`, `14`, `23`, `24`). The last octet identifies the node on that link: `1` for node-1/node-2, `2` for node-3/node-4.
 
-| Node | Interface | IP address | Netmask | Connected to |
-|------|-----------|------------|---------|--------------|
-| node-1 | eth0 | DHCP | - | management |
-| node-1 | eth1_13 | 10.0.13.1 | 255.255.255.252 | node-3 |
-| node-1 | eth2_14 | 10.0.14.1 | 255.255.255.252 | node-4 |
-| node-2 | eth0 | DHCP | - | management |
-| node-2 | eth1_23 | 10.0.23.1 | 255.255.255.252 | node-3 |
-| node-2 | eth2_24 | 10.0.24.1 | 255.255.255.252 | node-4 |
-| node-3 | eth0 | DHCP | - | management |
-| node-3 | eth1_13 | 10.0.13.2 | 255.255.255.252 | node-1 |
-| node-3 | eth2_23 | 10.0.23.2 | 255.255.255.252 | node-2 |
-| node-4 | eth0 | DHCP | - | management |
-| node-4 | eth1_14 | 10.0.14.2 | 255.255.255.252 | node-1 |
-| node-4 | eth2_24 | 10.0.24.2 | 255.255.255.252 | node-2 |
+| Node | Interface | MAC address | IP address | Netmask | Connected to |
+|------|-----------|-------------|------------|---------|--------------|
+| node-1 | eth0 | 0c:3e:96:80:00:00 | DHCP | - | management |
+| node-1 | eth1_13 | 0c:3e:96:80:00:01 | 10.0.13.1 | 255.255.255.252 | node-3 |
+| node-1 | eth2_14 | 0c:3e:96:80:00:02 | 10.0.14.1 | 255.255.255.252 | node-4 |
+| node-2 | eth0 | 0c:d7:44:9c:00:00 | DHCP | - | management |
+| node-2 | eth1_23 | 0c:d7:44:9c:00:01 | 10.0.23.1 | 255.255.255.252 | node-3 |
+| node-2 | eth2_24 | 0c:d7:44:9c:00:02 | 10.0.24.1 | 255.255.255.252 | node-4 |
+| node-3 | eth0 | 0c:5a:73:85:00:00 | DHCP | - | management |
+| node-3 | eth1_13 | 0c:5a:73:85:00:01 | 10.0.13.2 | 255.255.255.252 | node-1 |
+| node-3 | eth2_23 | 0c:5a:73:85:00:02 | 10.0.23.2 | 255.255.255.252 | node-2 |
+| node-4 | eth0 | 0c:08:8c:fb:00:00 | DHCP | - | management |
+| node-4 | eth1_14 | 0c:08:8c:fb:00:01 | 10.0.14.2 | 255.255.255.252 | node-1 |
+| node-4 | eth2_24 | 0c:08:8c:fb:00:02 | 10.0.24.2 | 255.255.255.252 | node-2 |
 
 
 ## VLAN Setup on the Switch
