@@ -48,6 +48,25 @@ The 3rd octet of each address corresponds to the link between two nodes (`13`, `
 | node-4 | eth1_14 | 0c:08:8c:fb:00:01 | 10.0.14.2 | 255.255.255.252 | node-1 |
 | node-4 | eth2_24 | 0c:08:8c:fb:00:02 | 10.0.24.2 | 255.255.255.252 | node-2 |
 
+Additionally, `arp_ignore` was set to `1` on every interface of every node. By default (`0`) Linux answers an ARP request for any locally configured address regardless of which interface the request arrived on, so a node would reply for its own address on another VLAN. With `1` an interface only answers for addresses configured on that same interface. This is needed to avoid creating false positive results during the isolation proof.
+
+For instance command for node-1:
+
+```bash
+root@node-1:~$ sysctl -w net.ipv4.conf.all.arp_ignore=1 && sysctl -w net.ipv4.conf.eth1_13.arp_ignore=1 && sysctl -w net.ipv4.conf.eth2_14.arp_ignore=1
+```
+
+To make it persistent:
+
+```bash
+root@node-1:~$ cat >> /etc/sysctl.conf <<'EOF'
+net.ipv4.conf.all.arp_ignore=1
+net.ipv4.conf.eth1_13.arp_ignore=1
+net.ipv4.conf.eth2_14.arp_ignore=1
+EOF
+```
+
+*Same commands but with other interfaces were run for the other nodes too.*
 
 ## VLAN Setup on the Switch
 
@@ -150,7 +169,7 @@ auto lo
 iface lo inet loopback
 
 auto br1
-iface br1 inet manual
+iface br1 inet dhcp
     bridge_ports eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11 eth12
     up ip link set dev br1 type bridge vlan_filtering 1
     up bridge vlan add vid 13 dev eth1 pvid untagged
@@ -171,10 +190,41 @@ iface br1 inet manual
     up bridge vlan del vid 1 dev eth11
 ```
 
+Additionally the source of the ip address of the bridge was set to the DHCP to get access to the internet on the switch.
+
+## Nodes Getting IPs Over VLAN 1
+
+Since in the `/etc/network/interfaces` the source of ip for `eth0` is set to the DHCP by default they will get ip from the host over the NAT. 
+
+Below is the check of the ips:
+
+For node-1:
+```bash
+root@node-1:~$ ip -br a show eth0
+eth0             UP             192.168.122.231/24 fe80::e3e:96ff:fe80:0/64 
+```
+
+For node-2:
+```bash
+root@node-2:~$ ip -br a show eth0
+eth0             UP             192.168.122.47/24 fe80::ed7:44ff:fe9c:0/64 
+```
+
+For node-3:
+```bash
+root@node-3:~$ ip -br a show eth0
+eth0             UP             192.168.122.163/24 fe80::e5a:73ff:fe85:0/64 
+```
+
+For node-4:
+```bash
+root@node-4:~$ ip -br a show eth0
+eth0             UP             192.168.122.38/24 fe80::e08:8cff:fefb:0/64 
+```
 
 ## Connectivity Proof
 
-To prove connectivity for each link between nodes, I ran `ping` on one node and `tcpdump` on the other. If `ping` shows 0% packet loss and `tcpdump` shows the ICMP packets arriving, the link is healthy. It also proves conectivity in two directions since `ping` requires sending and then reciving the responce.
+To prove connectivity for each link between nodes, I ran `ping` on one node and `tcpdump` on the other. If `ping` shows 0% packet loss and `tcpdump` shows the ICMP packets arriving, the link is healthy. It also proves connectivity in two directions since `ping` requires sending and then receiving the response.
 
 ### Node 1 <-> Node 3 Connectivity
 
@@ -354,7 +404,7 @@ PING 10.0.24.1 (10.0.24.1): 56 data bytes
 5 packets transmitted, 0 packets received, 100% packet loss
 ```
 
-The same test was repeated for every VLAN with the same result: an interface's IP address could not be pinged from an interface on a different VLAN.
+The same check was carried out from an interface on each of the remaining VLANs (14, 23 and 24) towards the addresses of the other three VLANs. Every attempt ended with 100% packet loss. The output of those runs is omitted here to avoid repeating near-identical listings.
 
 ### ARP Broadcast Isolation
 
@@ -408,8 +458,7 @@ listening on eth2_24, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 `tcpdump` on the node-3 interface `eth2_23` (vlan 23):
 ```bash
-root@node-3:~$ tcpdump -n 
--e -i eth2_23 arp
+root@node-3:~$ tcpdump -n -e -i eth2_23 arp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
 listening on eth2_23, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 ^C
@@ -429,12 +478,12 @@ listening on eth1_14, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 0 packets dropped by kernel
 ```
 
-No ARP packets were captured on any interface belonging to a different VLAN than the one the broadcast was sent on. The same test was repeated for every VLAN with the same result.
+No ARP packets were captured on any interface belonging to a different VLAN than the one the broadcast was sent on. The same check was carried out with the broadcast originating on each of the remaining VLANs (14, 23 and 24) while capturing on interfaces of the other three. No ARP packets were captured in any of those runs either. Their output is omitted here to avoid repeating near-identical listings.
 
 
 ## Addition of the Tagged Link
 
-The link between the switch and the NAT node was turned into a trunk instead of adding a fifth dedicated cable. VLAN 1 (management) stays untagged on this link so host connectivity is not broken, while VLANs 13, 14, 23 and 24 (the node-to-node data VLANs) are carried as tagged traffic.
+The link between the switch and the NAT node was turned into a trunk. VLAN 1 (management) stays untagged on this link so host connectivity is not broken, while VLANs 13, 14, 23 and 24 (the node-to-node data VLANs) are carried as tagged traffic.
 
 ### Switch Configuration
 
@@ -470,6 +519,38 @@ eth12             1 PVID Egress Untagged
 br1               1 PVID Egress Untagged
 ```
 
+To make it persistent `/etc/network/interfaces` was updated:
+
+```text
+auto lo
+iface lo inet loopback
+
+auto br1
+iface br1 inet dhcp
+    bridge_ports eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11 eth12
+    up ip link set dev br1 type bridge vlan_filtering 1
+    up bridge vlan add vid 13 dev eth1 pvid untagged
+    up bridge vlan del vid 1 dev eth1
+    up bridge vlan add vid 14 dev eth2 pvid untagged
+    up bridge vlan del vid 1 dev eth2
+    up bridge vlan add vid 23 dev eth4 pvid untagged
+    up bridge vlan del vid 1 dev eth4
+    up bridge vlan add vid 24 dev eth5 pvid untagged
+    up bridge vlan del vid 1 dev eth5
+    up bridge vlan add vid 13 dev eth7 pvid untagged
+    up bridge vlan del vid 1 dev eth7
+    up bridge vlan add vid 23 dev eth8 pvid untagged
+    up bridge vlan del vid 1 dev eth8
+    up bridge vlan add vid 14 dev eth10 pvid untagged
+    up bridge vlan del vid 1 dev eth10
+    up bridge vlan add vid 24 dev eth11 pvid untagged
+    up bridge vlan del vid 1 dev eth11
+    up bridge vlan add vid 13 dev eth12
+    up bridge vlan add vid 14 dev eth12
+    up bridge vlan add vid 23 dev eth12
+    up bridge vlan add vid 24 dev eth12
+```
+
 ### Capturing Trunk Traffic
 
 To prove each VLAN is actually tagged on the wire, `eth12` was captured to a file and then read back after generating traffic on each VLAN in turn:
@@ -477,7 +558,7 @@ To prove each VLAN is actually tagged on the wire, `eth12` was captured to a fil
 root@switch:~$ tcpdump -n -e -U -i eth12 -w /root/trunk.pcap
 ```
 
-To generate traffic on a given VLAN, `arping` was run from a node's interface on that VLAN, targeting the IP address of a node on a different VLAN. Since the target is unreachable from that VLAN, `arping` cannot resolve it via unicast and keeps re-sending ARP broadcasts for the full count.
+To generate traffic on a given VLAN, `arping` was run from a node's interface on that VLAN, targeting the IP address of a node on a different VLAN. This is intentional: `arping` sends its first probe as a broadcast, then switches to unicast once a reply fills the ARP cache. Since the target is on another VLAN and never replies, no cache entry is ever created, so every probe stays a broadcast and gets flooded to all members of the source VLAN, including the trunk port.
 
 #### VLAN 13
 
