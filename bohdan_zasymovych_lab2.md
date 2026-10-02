@@ -194,7 +194,7 @@ Additionally the source of the ip address of the bridge was set to the DHCP to g
 
 ## Nodes Getting IPs Over VLAN 1
 
-Since in the `/etc/network/interfaces` the source of ip for `eth0` is set to the DHCP by default they will get ip from the host over the NAT. 
+Since `eth0` is set to DHCP, the nodes get their IPs over VLAN 1 from the host's libvirt DHCP server (`dnsmasq` on `virbr0`), reached through the GNS3 NAT node.
 
 Below is the check of the ips:
 
