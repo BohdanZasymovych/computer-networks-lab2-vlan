@@ -387,10 +387,10 @@ listening on eth2_24, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 
 `ping` from the node-1 interface `eth1_13` (vlan 13) to addresses on vlan 14, 23 and 24:
 ```bash
-root@node-1:~$ ping -c 5 -I eth1_13 10.0.14.1
-PING 10.0.14.1 (10.0.14.1): 56 data bytes
+root@node-1:~$ ping -c 5 -I eth1_13 10.0.14.2
+PING 10.0.14.2 (10.0.14.2): 56 data bytes
 
---- 10.0.14.1 ping statistics ---
+--- 10.0.14.2 ping statistics ---
 5 packets transmitted, 0 packets received, 100% packet loss
 root@node-1:~$ ping -c 5 -I eth1_13 10.0.23.1
 PING 10.0.23.1 (10.0.23.1): 56 data bytes
@@ -412,13 +412,13 @@ The same check was carried out from an interface on each of the remaining VLANs 
 
 `arping` on the node-1 interface `eth1_13` (vlan 13):
 ```bash
-root@node-1:~$ arping -c 5 -I eth1_13 10.0.13.2
+root@node-1:~$ arping -b -c 5 -I eth1_13 10.0.13.2
 ARPING 10.0.13.2 from 10.0.13.1 eth1_13
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.701ms
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 2.182ms
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.473ms
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.496ms
-Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 2.032ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.856ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 2.125ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 2.405ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 2.374ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.990ms
 Sent 5 probe(s) (0 broadcast(s))
 Received 5 response(s) (0 request(s), 0 broadcast(s))
 ```
@@ -426,19 +426,19 @@ Received 5 response(s) (0 request(s), 0 broadcast(s))
 The broadcast is confirmed to have gone out, since node-3's interface `eth1_13` (on the same vlan 13) replies to it. But nothing arrives on the other VLANs:
 
 ```bash
-root@node-3:~$ tcpdump -n -e -i eth1_13 arp
+root@node-3:~$ tcpdump -e -n  -i eth1_13 arp
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
 listening on eth1_13, link-type EN10MB (Ethernet), snapshot length 262144 bytes
-12:34:54.532380 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
-12:34:54.532431 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
-12:34:55.532747 0c:3e:96:80:00:01 > 0c:5a:73:85:00:01, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (0c:5a:73:85:00:01) tell 10.0.13.1, length 46
-12:34:55.532799 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
-12:34:56.533108 0c:3e:96:80:00:01 > 0c:5a:73:85:00:01, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (0c:5a:73:85:00:01) tell 10.0.13.1, length 46
-12:34:56.533147 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
-12:34:57.533689 0c:3e:96:80:00:01 > 0c:5a:73:85:00:01, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (0c:5a:73:85:00:01) tell 10.0.13.1, length 46
-12:34:57.533728 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
-12:34:58.534416 0c:3e:96:80:00:01 > 0c:5a:73:85:00:01, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (0c:5a:73:85:00:01) tell 10.0.13.1, length 46
-12:34:58.534469 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+16:33:44.431019 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+16:33:44.431150 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+16:33:45.431531 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+16:33:45.431616 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+16:33:46.432032 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+16:33:46.432100 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+16:33:47.432604 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+16:33:47.432695 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
+16:33:48.432801 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+16:33:48.432883 0c:5a:73:85:00:01 > 0c:3e:96:80:00:01, ethertype ARP (0x0806), length 42: Reply 10.0.13.2 is-at 0c:5a:73:85:00:01, length 28
 ^C
 10 packets captured
 10 packets received by filter
@@ -551,136 +551,174 @@ iface br1 inet dhcp
     up bridge vlan add vid 24 dev eth12
 ```
 
+
 ### Capturing Trunk Traffic
 
-To prove each VLAN is actually tagged on the wire, `eth12` was captured to a file and then read back after generating traffic on each VLAN in turn:
+To prove that data VLANs are tagged and VLAN 1 is untagged on the trunk (`eth12`), one capture was taken on the switch while traffic was generated on all four data VLANs and on VLAN 1.
+
+#### 1. Start the capture (switch)
+
 ```bash
-root@switch:~$ tcpdump -n -e -U -i eth12 -w /root/trunk.pcap
+root@switch:~$ tcpdump -e -n -U -i eth12 -w /root/trunk.pcap
+tcpdump: listening on eth12, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+^C54 packets captured
+54 packets received by filter
+0 packets dropped by kernel
 ```
 
-To generate traffic on a given VLAN, `arping` was run from a node's interface on that VLAN, targeting the IP address of a node on a different VLAN. This is intentional: `arping` sends its first probe as a broadcast, then switches to unicast once a reply fills the ARP cache. Since the target is on another VLAN and never replies, no cache entry is ever created, so every probe stays a broadcast and gets flooded to all members of the source VLAN, including the trunk port.
+#### 2. Generate traffic
 
-#### VLAN 13
+`arping -b` sends every probe as a broadcast, so each request is flooded to all members of its VLAN, including the trunk port.
 
-`arping` from node-1's `eth1_13` (vlan 13) to a vlan 14 address:
+**VLAN 13** (node-1 to node-3):
+
 ```bash
-root@node-1:~$ arping -c 5 -I eth1_13 10.0.14.1
-ARPING 10.0.14.1 from 10.0.13.1 eth1_13
+root@node-1:~$ arping -b -c 5 -I eth1_13 10.0.13.2
+ARPING 10.0.13.2 from 10.0.13.1 eth1_13
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 2.551ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.872ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 2.400ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.523ms
+Unicast reply from 10.0.13.2 [0c:5a:73:85:00:01] 1.883ms
 Sent 5 probe(s) (0 broadcast(s))
-Received 0 response(s) (0 request(s), 0 broadcast(s))
+Received 5 response(s) (0 request(s), 0 broadcast(s))
 ```
 
-Traffic captured on `eth12`:
-```bash
-root@switch:~$ tcpdump -n -e -r /root/trunk.pcap 
-reading from file /root/trunk.pcap, link-type EN10MB (Ethernet), snapshot length 262144
-14:57:42.307756 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-14:57:43.173947 0c:cb:45:60:00:00 > ff:ff:ff:ff:ff:ff, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 0c:cb:45:60:00:00, length 300
-14:57:43.176377 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype IPv4 (0x0800), length 342: 192.168.122.1.67 > 192.168.122.186.68: BOOTP/DHCP, Reply, length 300
-14:57:43.180467 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.1 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
-14:57:44.180981 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.1 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
-14:57:44.292634 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-14:57:45.181580 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.1 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
-14:57:46.182127 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.1 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
-14:57:46.185967 0c:cb:45:60:00:00 > ff:ff:ff:ff:ff:ff, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 0c:cb:45:60:00:00, length 300
-14:57:46.187993 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype IPv4 (0x0800), length 342: 192.168.122.1.67 > 192.168.122.186.68: BOOTP/DHCP, Reply, length 300
-14:57:46.339860 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-14:57:47.182589 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.1 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
-14:57:48.323984 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-14:57:49.197965 0c:cb:45:60:00:00 > ff:ff:ff:ff:ff:ff, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 0c:cb:45:60:00:00, length 300
-14:57:49.199930 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype IPv4 (0x0800), length 342: 192.168.122.1.67 > 192.168.122.186.68: BOOTP/DHCP, Reply, length 300
-```
+**VLAN 14** (node-1 to node-4):
 
-#### VLAN 14
-
-`arping` from node-1's `eth2_14` (vlan 14) to a vlan 13 address:
 ```bash
-root@node-1:~$ arping -c 5 -I eth2_14 10.0.13.1
-ARPING 10.0.13.1 from 10.0.14.1 eth2_14
+root@node-1:~$ arping -b -c 5 -I eth2_14 10.0.14.2
+ARPING 10.0.14.2 from 10.0.14.1 eth2_14
+Unicast reply from 10.0.14.2 [0c:08:8c:fb:00:01] 2.210ms
+Unicast reply from 10.0.14.2 [0c:08:8c:fb:00:01] 1.140ms
+Unicast reply from 10.0.14.2 [0c:08:8c:fb:00:01] 2.180ms
+Unicast reply from 10.0.14.2 [0c:08:8c:fb:00:01] 2.072ms
+Unicast reply from 10.0.14.2 [0c:08:8c:fb:00:01] 1.376ms
 Sent 5 probe(s) (0 broadcast(s))
-Received 0 response(s) (0 request(s), 0 broadcast(s))
+Received 5 response(s) (0 request(s), 0 broadcast(s))
 ```
 
-Traffic captured on `eth12`:
-```bash
-root@switch:~$ tcpdump -n -e -r /root/trunk.pcap 
-reading from file /root/trunk.pcap, link-type EN10MB (Ethernet), snapshot length 262144
-14:58:58.340338 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-14:58:59.367005 0c:cb:45:60:00:00 > ff:ff:ff:ff:ff:ff, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 0c:cb:45:60:00:00, length 300
-14:58:59.369297 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype IPv4 (0x0800), length 342: 192.168.122.1.67 > 192.168.122.186.68: BOOTP/DHCP, Reply, length 300
-14:59:00.323210 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-14:59:00.978896 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
-14:59:01.979508 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
-14:59:02.306984 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-14:59:02.378893 0c:cb:45:60:00:00 > ff:ff:ff:ff:ff:ff, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 0c:cb:45:60:00:00, length 300
-14:59:02.380229 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype IPv4 (0x0800), length 342: 192.168.122.1.67 > 192.168.122.186.68: BOOTP/DHCP, Reply, length 300
-14:59:02.979906 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
-14:59:03.980271 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
-14:59:04.292011 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-14:59:04.981091 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
-14:59:05.389880 0c:cb:45:60:00:00 > ff:ff:ff:ff:ff:ff, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 0c:cb:45:60:00:00, length 300
-14:59:05.391192 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype IPv4 (0x0800), length 342: 192.168.122.1.67 > 192.168.122.186.68: BOOTP/DHCP, Reply, length 300
-14:59:06.339114 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-14:59:08.323105 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-```
+**VLAN 23** (node-2 to node-3):
 
-#### VLAN 23
-
-`arping` from node-2's `eth1_23` (vlan 23) to a vlan 13 address:
 ```bash
-root@node-2:~$ arping -c 5 -I eth1_23 10.0.13.1
-ARPING 10.0.13.1 from 10.0.23.1 eth1_23
+root@node-2:~$ arping -b -c 5 -I eth1_23 10.0.23.2
+ARPING 10.0.23.2 from 10.0.23.1 eth1_23
+Unicast reply from 10.0.23.2 [0c:5a:73:85:00:02] 1.681ms
+Unicast reply from 10.0.23.2 [0c:5a:73:85:00:02] 1.655ms
+Unicast reply from 10.0.23.2 [0c:5a:73:85:00:02] 1.808ms
+Unicast reply from 10.0.23.2 [0c:5a:73:85:00:02] 1.863ms
+Unicast reply from 10.0.23.2 [0c:5a:73:85:00:02] 1.452ms
 Sent 5 probe(s) (0 broadcast(s))
-Received 0 response(s) (0 request(s), 0 broadcast(s))
+Received 5 response(s) (0 request(s), 0 broadcast(s))
 ```
 
-Traffic captured on `eth12`:
-```bash
-root@switch:~$ tcpdump -n -e -r /root/trunk.pcap 
-reading from file /root/trunk.pcap, link-type EN10MB (Ethernet), snapshot length 262144
-15:00:52.322412 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-15:00:53.802188 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
-15:00:54.307460 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-15:00:54.802917 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
-15:00:55.803359 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
-15:00:56.034186 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype ARP (0x0806), length 42: Request who-has 192.168.122.186 tell 192.168.122.1, length 28
-15:00:56.290465 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-15:00:56.803698 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
-15:00:57.058400 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype ARP (0x0806), length 42: Request who-has 192.168.122.186 tell 192.168.122.1, length 28
-15:00:57.804323 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
-15:00:58.082224 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype ARP (0x0806), length 42: Request who-has 192.168.122.186 tell 192.168.122.1, length 28
-15:00:58.338284 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-```
+**VLAN 24** (node-2 to node-4):
 
-#### VLAN 24
-
-`arping` from node-2's `eth2_24` (vlan 24) to a vlan 13 address:
 ```bash
-root@node-2:~$ arping -c 5 -I eth2_24 10.0.13.1
-ARPING 10.0.13.1 from 10.0.24.1 eth2_24
+root@node-2:~$ arping -b -c 5 -I eth2_24 10.0.24.2
+ARPING 10.0.24.2 from 10.0.24.1 eth2_24
+Unicast reply from 10.0.24.2 [0c:08:8c:fb:00:02] 1.258ms
+Unicast reply from 10.0.24.2 [0c:08:8c:fb:00:02] 1.405ms
+Unicast reply from 10.0.24.2 [0c:08:8c:fb:00:02] 1.325ms
+Unicast reply from 10.0.24.2 [0c:08:8c:fb:00:02] 1.922ms
+Unicast reply from 10.0.24.2 [0c:08:8c:fb:00:02] 1.588ms
 Sent 5 probe(s) (0 broadcast(s))
-Received 0 response(s) (0 request(s), 0 broadcast(s))
+Received 5 response(s) (0 request(s), 0 broadcast(s))
 ```
 
-Traffic captured on `eth12`:
+**VLAN 1, untagged** (node-1 management port `eth0` to the NAT gateway `192.168.122.1`):
+
 ```bash
-root@switch:~$ tcpdump -n -e -r /root/trunk.pcap 
-reading from file /root/trunk.pcap, link-type EN10MB (Ethernet), snapshot length 262144
-15:02:22.305781 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-15:02:23.017548 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
-15:02:23.814006 0c:cb:45:60:00:00 > ff:ff:ff:ff:ff:ff, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 0c:cb:45:60:00:00, length 300
-15:02:23.816211 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype IPv4 (0x0800), length 342: 192.168.122.1.67 > 192.168.122.186.68: BOOTP/DHCP, Reply, length 300
-15:02:24.017745 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
-15:02:24.289698 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-15:02:25.018180 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
-15:02:26.018524 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
-15:02:26.337702 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
-15:02:26.825894 0c:cb:45:60:00:00 > ff:ff:ff:ff:ff:ff, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 0c:cb:45:60:00:00, length 300
-15:02:26.827617 52:54:00:cd:24:e1 > 0c:cb:45:60:00:00, ethertype IPv4 (0x0800), length 342: 192.168.122.1.67 > 192.168.122.186.68: BOOTP/DHCP, Reply, length 300
-15:02:27.019217 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.1 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
-15:02:28.322566 2e:18:d2:20:52:65 > 01:80:c2:00:00:00, 802.3, length 38: LLC, dsap STP (0x42) Individual, ssap STP (0x42) Command, ctrl 0x03: STP 802.1d, Config, Flags [none], bridge-id 8000.52:54:00:cd:24:e1.8001, length 35
+root@node-1:~$ arping -b -c 5 -I eth0 192.168.122.1
+ARPING 192.168.122.1 from 192.168.122.231 eth0
+Unicast reply from 192.168.122.1 [52:54:00:cd:24:e1] 1.630ms
+Unicast reply from 192.168.122.1 [52:54:00:cd:24:e1] 1.908ms
+Unicast reply from 192.168.122.1 [52:54:00:cd:24:e1] 2.164ms
+Unicast reply from 192.168.122.1 [52:54:00:cd:24:e1] 2.468ms
+Unicast reply from 192.168.122.1 [52:54:00:cd:24:e1] 2.343ms
+Sent 5 probe(s) (0 broadcast(s))
+Received 5 response(s) (0 request(s), 0 broadcast(s))
 ```
 
-### Conclusion
+#### 3. Tagged traffic: VLAN 13, 14, 23, 24
 
-For all four VLANs, the `arping` broadcasts show up on `eth12` tagged with the correct `vlan` id (13, 14, 23 or 24), while unrelated VLAN 1 traffic (STP, DHCP, and the NAT gateway's own ARP) stays untagged on the same link. This confirms the trunk is configured correctly: a single physical link correctly carries both the untagged management VLAN and tagged data VLANs at the same time.
+The capture is read back with a filter per VLAN ID.
+
+**VLAN 13**
+
+```bash
+root@switch:~$ tcpdump -n -e -r /root/trunk.pcap 'vlan 13'
+reading from file /root/trunk.pcap, link-type EN10MB (Ethernet), snapshot length 262144
+16:10:44.048214 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+16:10:45.048453 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+16:10:46.049019 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+16:10:47.049286 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+16:10:48.049871 0c:3e:96:80:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 13, p 0, ethertype ARP (0x0806), Request who-has 10.0.13.2 (ff:ff:ff:ff:ff:ff) tell 10.0.13.1, length 46
+```
+
+**VLAN 14**
+
+```bash
+root@switch:~$ tcpdump -n -e -r /root/trunk.pcap 'vlan 14'
+reading from file /root/trunk.pcap, link-type EN10MB (Ethernet), snapshot length 262144
+16:10:53.110506 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.2 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
+16:10:54.110660 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.2 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
+16:10:55.111527 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.2 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
+16:10:56.111982 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.2 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
+16:10:57.112002 0c:3e:96:80:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 14, p 0, ethertype ARP (0x0806), Request who-has 10.0.14.2 (ff:ff:ff:ff:ff:ff) tell 10.0.14.1, length 46
+```
+
+**VLAN 23**
+
+```bash
+root@switch:~$ tcpdump -n -e -r /root/trunk.pcap 'vlan 23'
+reading from file /root/trunk.pcap, link-type EN10MB (Ethernet), snapshot length 262144
+16:11:02.954882 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.23.2 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
+16:11:03.955721 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.23.2 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
+16:11:04.956157 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.23.2 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
+16:11:05.956836 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.23.2 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
+16:11:06.957170 0c:d7:44:9c:00:01 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 23, p 0, ethertype ARP (0x0806), Request who-has 10.0.23.2 (ff:ff:ff:ff:ff:ff) tell 10.0.23.1, length 46
+```
+
+**VLAN 24**
+
+```bash
+root@switch:~$ tcpdump -n -e -r /root/trunk.pcap 'vlan 24'
+reading from file /root/trunk.pcap, link-type EN10MB (Ethernet), snapshot length 262144
+16:11:10.106028 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.24.2 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
+16:11:11.106326 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.24.2 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
+16:11:12.106846 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.24.2 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
+16:11:13.107493 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.24.2 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
+16:11:14.107738 0c:d7:44:9c:00:02 > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 64: vlan 24, p 0, ethertype ARP (0x0806), Request who-has 10.0.24.2 (ff:ff:ff:ff:ff:ff) tell 10.0.24.1, length 46
+```
+
+#### 4. Untagged traffic: VLAN 1
+
+```bash
+root@switch:~$ tcpdump -n -e -r /root/trunk.pcap 'arp and not vlan'
+reading from file /root/trunk.pcap, link-type EN10MB (Ethernet), snapshot length 262144
+16:11:19.143874 0c:3e:96:80:00:00 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 192.168.122.1 (ff:ff:ff:ff:ff:ff) tell 192.168.122.231, length 46
+16:11:19.144840 52:54:00:cd:24:e1 > 0c:3e:96:80:00:00, ethertype ARP (0x0806), length 42: Reply 192.168.122.1 is-at 52:54:00:cd:24:e1, length 28
+16:11:20.144411 0c:3e:96:80:00:00 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 192.168.122.1 (ff:ff:ff:ff:ff:ff) tell 192.168.122.231, length 46
+16:11:20.145604 52:54:00:cd:24:e1 > 0c:3e:96:80:00:00, ethertype ARP (0x0806), length 42: Reply 192.168.122.1 is-at 52:54:00:cd:24:e1, length 28
+16:11:21.144624 0c:3e:96:80:00:00 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 192.168.122.1 (ff:ff:ff:ff:ff:ff) tell 192.168.122.231, length 46
+16:11:21.146006 52:54:00:cd:24:e1 > 0c:3e:96:80:00:00, ethertype ARP (0x0806), length 42: Reply 192.168.122.1 is-at 52:54:00:cd:24:e1, length 28
+16:11:22.144996 0c:3e:96:80:00:00 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 192.168.122.1 (ff:ff:ff:ff:ff:ff) tell 192.168.122.231, length 46
+16:11:22.146691 52:54:00:cd:24:e1 > 0c:3e:96:80:00:00, ethertype ARP (0x0806), length 42: Reply 192.168.122.1 is-at 52:54:00:cd:24:e1, length 28
+16:11:23.145598 0c:3e:96:80:00:00 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Request who-has 192.168.122.1 (ff:ff:ff:ff:ff:ff) tell 192.168.122.231, length 46
+16:11:23.147131 52:54:00:cd:24:e1 > 0c:3e:96:80:00:00, ethertype ARP (0x0806), length 42: Reply 192.168.122.1 is-at 52:54:00:cd:24:e1, length 28
+```
+
+Here the gateway replies are visible too, because the gateway sits behind `eth12`.
+
+#### Conclusion
+
+| Traffic | VLAN | On `eth12` |
+|---|---|---|
+| node-1 ↔ node-3 | 13 | tagged (vlan 13) |
+| node-1 ↔ node-4 | 14 | tagged (vlan 14) |
+| node-2 ↔ node-3 | 23 | tagged (vlan 23) |
+| node-2 ↔ node-4 | 24 | tagged (vlan 24) |
+| node-1 `eth0` ↔ gateway | 1 | untagged |
+
+The data VLANs are tagged with the correct VLAN ID and VLAN 1 is untagged on the same physical link. The trunk therefore carries the untagged management VLAN and the tagged data VLANs at the same time.
